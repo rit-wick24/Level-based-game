@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",  // Compiled JS files go here
+    "rootDir": "./",  // Set the root to the project directory
+    "strict": true,
+    "module": "CommonJS",
+    "target": "ES6",
+    "esModuleInterop": true
+  },
+  "include": ["app.ts", "src/**/*"],  // Include both app.ts and src folder
+  "exclude": ["node_modules"]
+}
