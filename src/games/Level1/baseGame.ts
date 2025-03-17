@@ -1,27 +1,24 @@
+import { generateReelStrips } from "../common/reelGenerator";
+import { calculateWinnings } from "../common/payoutCalulator";
 import { loadParsheet } from "../common/parsheetLoader";
-import { getLevelFromXP } from "../common/XPManager";
-import { RandomResultGenerator } from "../common/RandomResultGenerator";
-import { PayoutCalculator } from "../common/payoutCalulator"; 
-import { initializeGameSettings, checkForWin } from "./helper";
-import { GameSettings } from "./types";
-import { Request, Response } from "express";
 import Player from "../../models/Player";
+import { Request, Response } from "express";
 
 export class BaseGame {
-  public settings: GameSettings;
-  public payoutCalculator: PayoutCalculator; // ✅ Declare `payoutCalculator` as a class property
+  public settings: any;
 
   constructor(public playerData: any) {
-    const level = getLevelFromXP(playerData.xpPoints);
-    const parsheet = loadParsheet(level);
-
-    if (!parsheet) throw new Error("Missing parsheet data!");
-
-    this.settings = initializeGameSettings(parsheet, playerData);
-    this.payoutCalculator = new PayoutCalculator(); // ✅ Initialize the payout calculator
+    const gameConfig = loadParsheet();
+    this.settings = {
+      matrix: gameConfig.matrix,
+      paylines: gameConfig.linesApiData,
+      Symbols: gameConfig.Symbols,
+      bets: gameConfig.bets,
+    };
+    this.processSpin = this.processSpin.bind(this);
   }
 
-  async processSpin(req: Request, res: Response) {
+   async processSpin(req: Request, res: Response)  {
     try {
       const { uniqueId, googleId, betAmount } = req.body;
       const player = await Player.findOne({ uniqueId, googleId });
@@ -31,36 +28,43 @@ export class BaseGame {
       if (betAmount > player.balance)
         return res.status(400).json({ message: "Insufficient balance" });
 
-      // ✅ Deduct bet amount
+      // ✅ Deduct balance
       player.balance -= betAmount;
       player.totalBet += betAmount;
 
       // ✅ Generate spin result
-      const result = new RandomResultGenerator(this.settings);
-      checkForWin(this.settings);
+      const reels = generateReelStrips();
+      const resultMatrix = this.generateSpinResult(reels);
 
-      // ✅ Use `payoutCalculator` instance correctly
-      this.payoutCalculator.calculatePayout(this.settings.lineData, this.settings.bets[1]);
-      const wonAmount = this.payoutCalculator.totalWinningAmount;
-
-      const xpGained = Math.floor((betAmount + wonAmount) / 10);
-
-      player.totalWon += wonAmount;
-      player.xpPoints += xpGained;
-      player.balance += wonAmount;
+      // ✅ Calculate winnings
+      const winnings = calculateWinnings(resultMatrix, betAmount);
+      player.balance += winnings;
+      player.totalWon += winnings;
 
       await player.save();
 
       return res.status(200).json({
         message: "Spin processed",
         balance: player.balance,
-        xpPoints: player.xpPoints,
-        winnings: wonAmount,
-        resultSymbols: result.resultMatrix,
+        winnings,
+        resultSymbols: resultMatrix,
       });
     } catch (error) {
       console.error("Error processing spin:", error);
       res.status(500).json({ message: "Server error" });
     }
+  }
+
+  generateSpinResult(reels: string[][]): string[][] {
+    const resultMatrix: string[][] = [];
+    for (let row = 0; row < 3; row++) {
+      const rowResult: string[] = [];
+      for (let col = 0; col < 5; col++) {
+        const randomIndex = Math.floor(Math.random() * reels[col].length);
+        rowResult.push(reels[col][randomIndex]);
+      }
+      resultMatrix.push(rowResult);
+    }
+    return resultMatrix;
   }
 }

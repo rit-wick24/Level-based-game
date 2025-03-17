@@ -7,6 +7,11 @@ export interface GameSettings {
     jackpotAmount: number[];
     useJackpot: boolean;
     lineData: any[];
+    wild: {
+      SymbolName: string;
+      SymbolID: number;
+      useWild: boolean
+  },
     };
 export interface Symbol {
   Name: string;

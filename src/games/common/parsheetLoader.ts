@@ -1,19 +1,11 @@
 import fs from "fs";
 import path from "path";
 
-export const loadParsheet = (level: number) => {
-  try {
-    const filePath = path.join(__dirname, `../Level${level}/parsheet.json`);
-    
-    if (!fs.existsSync(filePath)) {
-      console.error(`❌ Parsheet not found at: ${filePath}`);
-      throw new Error("Parsheet not found");
-    }
-
-    const parsheet = JSON.parse(fs.readFileSync(filePath, "utf8"));
-    return parsheet;
-  } catch (error) {
-    console.error("Error loading parsheet:", );
-    return null;
+export function loadParsheet(): any {
+  const filePath = path.join(__dirname, "../Level1/parsheet.json");
+  if (!fs.existsSync(filePath)) {
+    throw new Error("PARSHEET NOT FOUND");
   }
-};
+  const rawData = fs.readFileSync(filePath, "utf-8");
+  return JSON.parse(rawData);
+}

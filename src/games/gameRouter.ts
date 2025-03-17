@@ -1,11 +1,10 @@
 import express from "express";
-import { BaseGame } from "./Level1/baseGame";
+import { BaseGame } from "./Level1/BaseGame";
 
 const router = express.Router();
+const game = new BaseGame({});
 
-router.post("/spin", async (req, res) => {
-  const game = new BaseGame(req.body);
-  await game.processSpin(req, res);
-});
+// ✅ Ensure `processSpin` is properly called
+// router.post("/spin", game.processSpin);
 
 export default router;

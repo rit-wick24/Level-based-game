@@ -6,9 +6,14 @@ export function initializeGameSettings(parsheet: any, playerData: any) {
     Symbols: parsheet.Symbols,
     resultSymbolMatrix: [],
     currentGamedata: parsheet,
-    lineData: parsheet.lineData,
+    lineData: parsheet.linesApiData,
     useJackpot: parsheet.useJackpot,
     jackpotAmount: parsheet.jackpotAmount,
+    wild: {
+      SymbolName: "",
+      SymbolID: -1,
+      useWild: false,
+    },
   };
 }
 
