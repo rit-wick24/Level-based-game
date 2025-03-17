@@ -1,0 +1,10 @@
+{
+    "id": "Level1",
+    "matrix": { "x": 5, "y": 3 },
+    "bets": [10, 20, 50, 100],
+    "Symbols": [
+      { "Name": "Cherry", "Id": 1, "payout": 10, "reelInstance": { "0": 2, "1": 3 } },
+      { "Name": "Lemon", "Id": 2, "payout": 20, "reelInstance": { "0": 1, "1": 2 } }
+    ],
+    "lineData": [1,1,1,1,1]
+  }

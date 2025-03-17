@@ -8,19 +8,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllUsers = void 0;
-const User_1 = __importDefault(require("../models/User"));
-const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.login = exports.register = void 0;
+const authService_1 = require("../services/authService");
+const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const users = yield User_1.default.find().select("-password");
-        res.status(200).json(users);
+        const result = yield (0, authService_1.registerUser)(req.body);
+        res.status(201).json(result);
     }
     catch (error) {
-        res.status(500).json({ message: "Server error" });
+        res.status(400).json({ message: error.message });
     }
 });
-exports.getAllUsers = getAllUsers;
+exports.register = register;
+const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield (0, authService_1.loginUser)(req.body);
+        res.status(200).json(result);
+    }
+    catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+exports.login = login;

@@ -12,15 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllUsers = void 0;
-const User_1 = __importDefault(require("../models/User"));
-const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const users = yield User_1.default.find().select("-password");
-        res.status(200).json(users);
-    }
-    catch (error) {
-        res.status(500).json({ message: "Server error" });
-    }
-});
-exports.getAllUsers = getAllUsers;
+const express_1 = __importDefault(require("express"));
+const playerController_1 = require("../controllers/playerController");
+const playerController_2 = require("../controllers/playerController");
+const router = express_1.default.Router();
+// ✅ Login or Register a Player
+router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, playerController_1.loginOrRegister)(req, res);
+}));
+router.post("/update-balance", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, playerController_2.updateBalance)(req, res);
+}));
+exports.default = router;
