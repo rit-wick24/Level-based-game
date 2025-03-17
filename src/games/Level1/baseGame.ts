@@ -5,20 +5,11 @@ import Player from "../../models/Player";
 import { Request, Response } from "express";
 
 export class BaseGame {
-  public settings: any;
-
   constructor(public playerData: any) {
-    const gameConfig = loadParsheet();
-    this.settings = {
-      matrix: gameConfig.matrix,
-      paylines: gameConfig.linesApiData,
-      Symbols: gameConfig.Symbols,
-      bets: gameConfig.bets,
-    };
-    this.processSpin = this.processSpin.bind(this);
+    this.processSpin = this.processSpin.bind(this); // ✅ Bind method explicitly
   }
 
-   async processSpin(req: Request, res: Response)  {
+  async processSpin(req: Request, res: Response) {
     try {
       const { uniqueId, googleId, betAmount } = req.body;
       const player = await Player.findOne({ uniqueId, googleId });
@@ -28,15 +19,12 @@ export class BaseGame {
       if (betAmount > player.balance)
         return res.status(400).json({ message: "Insufficient balance" });
 
-      // ✅ Deduct balance
       player.balance -= betAmount;
       player.totalBet += betAmount;
 
-      // ✅ Generate spin result
       const reels = generateReelStrips();
       const resultMatrix = this.generateSpinResult(reels);
 
-      // ✅ Calculate winnings
       const winnings = calculateWinnings(resultMatrix, betAmount);
       player.balance += winnings;
       player.totalWon += winnings;
@@ -57,11 +45,11 @@ export class BaseGame {
 
   generateSpinResult(reels: string[][]): string[][] {
     const resultMatrix: string[][] = [];
-    for (let row = 0; row < 3; row++) {
+    for (let row = 0; row < 3; row++) {  // ✅ Row loop exists (good)
       const rowResult: string[] = [];
-      for (let col = 0; col < 5; col++) {
+      for (let col = 0; col < 5; col++) { // ✅ Column loop exists (good)
         const randomIndex = Math.floor(Math.random() * reels[col].length);
-        rowResult.push(reels[col][randomIndex]);
+        rowResult.push(reels[col][randomIndex]); // ❌ Only selecting 1 symbol per column (Not 3 per column)
       }
       resultMatrix.push(rowResult);
     }
